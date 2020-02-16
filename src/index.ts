@@ -98,13 +98,15 @@ export function getTypeDefs(testPath: string, rawSourceCode: string) {
     })
     .join('\n\n');
 
-  return prettifySource(
-    dirname(testPath),
-    `
-    ${rawSourceCode}
-    
-    /* Generated types: */
+  return prettifySource(dirname(testPath), ret);
+}
 
-    ${ret}`
-  );
+export function typeGetter(testPath: string, preamble?: string) {
+  return (rawSourceCode: string) => {
+    const source =
+      preamble !== undefined
+        ? `${preamble}\n\n${rawSourceCode}`
+        : rawSourceCode;
+    return getTypeDefs(testPath, source);
+  };
 }
