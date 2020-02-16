@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { dirname, basename, join, resolve } from 'path';
+import { dirname, basename, join } from 'path';
 import { writeFileSync, unlinkSync } from 'fs';
 
 const typeNamePrefix = '__rfh_checkit__';
@@ -62,26 +62,8 @@ function generateTypeInfo(
     const type = checker.getDeclaredTypeOfSymbol(symbol);
     const typeAsString = checker.typeToString(
       type,
-      sourceFile,
-      ts.TypeFormatFlags.NoTruncation |
-        ts.TypeFormatFlags.WriteArrayAsGenericType |
-        ts.TypeFormatFlags.UseStructuralFallback |
-        ts.TypeFormatFlags.WriteTypeArgumentsOfSignature |
-        ts.TypeFormatFlags.UseFullyQualifiedType |
-        ts.TypeFormatFlags.SuppressAnyReturnType |
-        ts.TypeFormatFlags.MultilineObjectLiterals |
-        ts.TypeFormatFlags.WriteClassExpressionAsTypeLiteral |
-        ts.TypeFormatFlags.UseTypeOfFunction |
-        ts.TypeFormatFlags.OmitParameterModifiers |
-        ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope |
-        ts.TypeFormatFlags.AllowUniqueESSymbolType |
-        ts.TypeFormatFlags.InTypeAlias
-
-      // ts.TypeFormatFlags.InTypeAlias |
-      //   ts.TypeFormatFlags.InFirstTypeArgument |
-      //   ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope |
-      //   ts.TypeFormatFlags.InFirstTypeArgument |
-      //   ts.TypeFormatFlags.MultilineObjectLiterals
+      sourceFile
+      // ts.TypeFormatFlags.InTypeAlias
     );
     return { name: symbol.name, typeDef: typeAsString };
   });
