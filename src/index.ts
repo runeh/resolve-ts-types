@@ -14,32 +14,7 @@ function writeTempSource(testPath: string, sourceCode: string) {
 
 function generateTypeInfo(programPath: string) {
   const program = ts.createProgram([programPath], {
-    target: ts.ScriptTarget.ES2018,
-    module: ts.ModuleKind.CommonJS,
-    lib: ['es2019'],
-    moduleResolution: ts.ModuleResolutionKind.NodeJs,
-    noUnusedLocals: true,
-    noUnusedParameters: true,
-    sourceMap: true,
-    declaration: true,
-    declarationMap: true,
-    strict: true,
-    noImplicitAny: true,
     strictNullChecks: true,
-    strictFunctionTypes: true,
-    strictPropertyInitialization: true,
-    noImplicitThis: true,
-    alwaysStrict: true,
-    noImplicitReturns: true,
-    noFallthroughCasesInSwitch: true,
-    allowSyntheticDefaultImports: true,
-    resolveJsonModule: true,
-    esModuleInterop: true,
-    typeRoots: [
-      'node_modules/@types',
-      './packages/folio-build-utils/jest/typings',
-    ],
-    types: ['node', 'jest'],
   });
 
   const checker = program.getTypeChecker();
