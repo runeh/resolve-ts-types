@@ -1,8 +1,37 @@
 import ts from 'typescript';
-import { dirname, basename, join } from 'path';
+import { dirname, basename, join, resolve } from 'path';
 import { writeFileSync, unlinkSync } from 'fs';
 
 const typeNamePrefix = '__rfh_checkit__';
+
+function loadTsConfig(dirPath: string) {
+  const parseConfigHost: ts.ParseConfigHost = {
+    fileExists: ts.sys.fileExists,
+    readFile: ts.sys.readFile,
+    readDirectory: ts.sys.readDirectory,
+    useCaseSensitiveFileNames: true,
+  };
+
+  const maybeConfigFile = ts.findConfigFile(
+    dirPath,
+    ts.sys.fileExists,
+    'tsconfig.json'
+  );
+
+  if (maybeConfigFile == undefined) {
+    throw new Error('setOptions: Cannot find tsconfig.json');
+  }
+
+  const configFile = ts.readConfigFile(maybeConfigFile, ts.sys.readFile);
+
+  const compilerOptions = ts.parseJsonConfigFileContent(
+    configFile.config,
+    parseConfigHost,
+    dirname(maybeConfigFile)
+  );
+
+  return compilerOptions;
+}
 
 function writeTempSource(testPath: string, sourceCode: string) {
   const testDir = dirname(testPath);
@@ -12,10 +41,11 @@ function writeTempSource(testPath: string, sourceCode: string) {
   return tempPath;
 }
 
-function generateTypeInfo(programPath: string) {
-  const program = ts.createProgram([programPath], {
-    strictNullChecks: true,
-  });
+function generateTypeInfo(
+  programPath: string,
+  compilerOptions: ts.CompilerOptions
+) {
+  const program = ts.createProgram([programPath], compilerOptions);
 
   const checker = program.getTypeChecker();
   const sourceFile = program.getSourceFile(programPath);
@@ -66,9 +96,11 @@ function preProcessSourceCode(sourceCode: string) {
 }
 
 export function getTypeDefs(testPath: string, rawSourceCode: string) {
+  const config = loadTsConfig(testPath);
+
   const sourceCode = preProcessSourceCode(rawSourceCode);
   const tempPath = writeTempSource(testPath, sourceCode);
-  const typeInfo = generateTypeInfo(tempPath);
+  const typeInfo = generateTypeInfo(tempPath, config.options);
   unlinkSync(tempPath);
 
   const ret = typeInfo
