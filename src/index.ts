@@ -1,6 +1,8 @@
 import ts from 'typescript';
 import { dirname, basename, join } from 'path';
-import { writeFileSync } from 'fs';
+import { writeFileSync, unlinkSync } from 'fs';
+
+const typeNamePrefix = '__rfh_checkit__';
 
 function writeTempSource(testPath: string, sourceCode: string) {
   const testDir = dirname(testPath);
@@ -23,79 +25,45 @@ function generateTypeInfo(programPath: string) {
     throw new Error(`Source file not found for path "${programPath}"`);
   }
 
-  const symbols = checker.getSymbolsInScope(
-    sourceFile,
-    ts.SymbolFlags.TypeAlias
-  );
+  const symbols = checker
+    .getSymbolsInScope(sourceFile, ts.SymbolFlags.TypeAlias)
+    .filter(symbol => symbol.name.startsWith(typeNamePrefix));
 
   const typeDefs = symbols.map(symbol => {
     const type = checker.getDeclaredTypeOfSymbol(symbol);
-    const typeAsString = checker.typeToString(type, sourceFile);
+    const typeAsString = checker.typeToString(
+      type,
+      sourceFile,
+      ts.TypeFormatFlags.InTypeAlias
+    );
     return { name: symbol.name, typeDef: typeAsString };
   });
 
   return typeDefs;
 }
 
-function main(testPath: string, sourceCode: string) {
+function preProcessSourceCode(sourceCode: string) {
+  return sourceCode.replace(/type\s+(\S+)\s?=/g, (_a, typeName) => {
+    return `type ${typeNamePrefix}${typeName} = `;
+  });
+}
+
+function main(testPath: string, rawSourceCode: string) {
+  const sourceCode = preProcessSourceCode(rawSourceCode);
   const tempPath = writeTempSource(testPath, sourceCode);
-  console.log('temppath', tempPath);
   const typeInfo = generateTypeInfo(tempPath);
-  // unlinkSync(tempPath);
+  unlinkSync(tempPath);
 
   for (const t of typeInfo) {
-    console.log(`type ${t.name} = ${t.typeDef}`);
+    console.log(`type ${t.name.replace(typeNamePrefix, '')} = ${t.typeDef}`);
   }
 }
 
 main(
   '/Users/runeh/Documents/prosjekter/jest-ts-type-snapshot/boop.ts',
   `
-type x = {name: string}
+type x = {name: string};
+type y = () => Promise<string>;
 
 `
 );
-
-// function generateDocumentation(
-//   fileNames: string[],
-//   options: ts.CompilerOptions
-// ): void {
-//   // Build a program using the set of root file names in fileNames
-//   let program = ts.createProgram(fileNames, options);
-
-//   // Get the checker, we will use it to find more about classes
-//   let checker = program.getTypeChecker();
-//   // let output: DocEntry[] = [];
-
-//   // Visit every sourceFile in the program
-//   for (const sourceFile of program.getSourceFiles()) {
-//     // console.log('./' + sourceFile.fileName);
-//     if (fileNames.includes('./' + sourceFile.fileName)) {
-//       const syms = checker.getSymbolsInScope(
-//         sourceFile,
-//         ts.SymbolFlags.TypeAlias
-//       );
-//       // .filter(e => e.name === 'lol' || e.name === 'lal');
-
-//       for (const sym of syms) {
-//         console.log(sym);
-
-//         const type = checker.getDeclaredTypeOfSymbol(sym);
-//         const typeAsString = checker.typeToString(
-//           type,
-//           sourceFile
-//           // // We need this TypeFormatFlags to avoid getting
-//           // // the type alias we created back
-//           // ts.TypeFormatFlags.InTypeAlias
-//         );
-
-//         console.log(`type ${sym.name} = ${typeAsString}`);
-//       }
-//     }
-//   }
-// }
-
-// generateDocumentation(process.argv.slice(2), {
-//   target: ts.ScriptTarget.ES5,
-//   module: ts.ModuleKind.CommonJS,
-// });

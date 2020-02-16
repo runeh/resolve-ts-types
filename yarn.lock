@@ -1978,11 +1978,6 @@ cross-spawn@^7.0.0:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-crypto-random-string@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-2.0.0.tgz#ef2a7a966ec11083388369baa02ebead229b30d5"
-  integrity sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==
-
 cssom@0.3.x, "cssom@>= 0.3.2 < 0.4.0":
   version "0.3.8"
   resolved "https://registry.yarnpkg.com/cssom/-/cssom-0.3.8.tgz#9f1276f5b2b463f2114d3f2c75250af8c1a36f4a"
@@ -5552,20 +5547,6 @@ table@^5.2.3:
     slice-ansi "^2.1.0"
     string-width "^3.0.0"
 
-temp-dir@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/temp-dir/-/temp-dir-2.0.0.tgz#bde92b05bdfeb1516e804c9c00ad45177f31321e"
-  integrity sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==
-
-tempy@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/tempy/-/tempy-0.4.0.tgz#2240e944cbb6b843415b7ef10b6dff9cda7297d0"
-  integrity sha512-mKnScm8aXv+cG6l1Nzp6mERGgC4UblbPnSDeQp83JgZ7xqDcnl+7u3+6zXnf1UE7YluDUTEIna1iKYwCSaOk9g==
-  dependencies:
-    temp-dir "^2.0.0"
-    type-fest "^0.10.0"
-    unique-string "^2.0.0"
-
 terser@^4.6.2:
   version "4.6.3"
   resolved "https://registry.yarnpkg.com/terser/-/terser-4.6.3.tgz#e33aa42461ced5238d352d2df2a67f21921f8d87"
@@ -5789,11 +5770,6 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-type-fest@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.10.0.tgz#7f06b2b9fbfc581068d1341ffabd0349ceafc642"
-  integrity sha512-EUV9jo4sffrwlg8s0zDhP0T2WD3pru5Xi0+HTE3zTUmBaZNhfkite9PdSJwdXLwPVW0jnAHT56pZHIOYckPEiw==
-
 type-fest@^0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.8.1.tgz#09e249ebde851d3b1e48d27c105444667f17b83d"
@@ -5836,13 +5812,6 @@ union-value@^1.0.0:
     get-value "^2.0.6"
     is-extendable "^0.1.1"
     set-value "^2.0.1"
-
-unique-string@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/unique-string/-/unique-string-2.0.0.tgz#39c6451f81afb2749de2b233e3f7c5e8843bd89d"
-  integrity sha512-uNaeirEPvpZWSgzwsPGtU2zVSTrn/8L5q/IexZmH0eH6SA73CmAA5U4GwORTxQAZs95TAXLNqeLoPPNO5gZfWg==
-  dependencies:
-    crypto-random-string "^2.0.0"
 
 universalify@^0.1.0:
   version "0.1.2"

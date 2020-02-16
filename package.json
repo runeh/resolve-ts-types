@@ -33,10 +33,9 @@
     "@types/node": "^13.7.1",
     "husky": "^4.2.3",
     "tsdx": "^0.12.3",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.5"
+    "tslib": "^1.10.0"
   },
   "dependencies": {
-    "tempy": "^0.4.0"
+    "typescript": "^3.7.5"
   }
 }
