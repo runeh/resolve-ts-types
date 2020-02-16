@@ -101,12 +101,20 @@ export function getTypeDefs(testPath: string, rawSourceCode: string) {
   return prettifySource(dirname(testPath), ret);
 }
 
+function sourceTemplate(
+  strOrTpl: string | TemplateStringsArray,
+  ...args: any[]
+) {
+  return typeof strOrTpl === 'string'
+    ? strOrTpl
+    : strOrTpl.map((str, i) => str + (args[i] || '')).join('');
+}
+
 export function typeGetter(testPath: string, preamble?: string) {
-  return (rawSourceCode: string) => {
-    const source =
-      preamble !== undefined
-        ? `${preamble}\n\n${rawSourceCode}`
-        : rawSourceCode;
-    return getTypeDefs(testPath, source);
+  return (strOrTpl: string | TemplateStringsArray, ...args: any[]) => {
+    const source = sourceTemplate(strOrTpl, args);
+    const fullSource =
+      preamble !== undefined ? `${preamble}\n\n${source}` : source;
+    return getTypeDefs(testPath, fullSource);
   };
 }
