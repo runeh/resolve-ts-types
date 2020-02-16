@@ -21,13 +21,14 @@
   },
   "prettier": {
     "printWidth": 80,
+    "proseWrap": "always",
     "semi": true,
     "singleQuote": true,
-    "trailingComma": "es5"
+    "trailingComma": "all"
   },
-  "name": "jest-ts-type-snapshot",
+  "name": "resolve-ts-types",
   "author": "Rune Finstad Halvorsen",
-  "module": "dist/jest-ts-type-snapshot.esm.js",
+  "module": "dist/resolve-ts-types.esm.js",
   "devDependencies": {
     "@types/jest": "^25.1.2",
     "@types/node": "^13.7.1",

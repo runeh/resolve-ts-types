@@ -16,7 +16,7 @@ function loadTsConfig(dirPath: string) {
   const maybeConfigFile = ts.findConfigFile(
     dirPath,
     ts.sys.fileExists,
-    'tsconfig.json'
+    'tsconfig.json',
   );
 
   if (maybeConfigFile == undefined) {
@@ -28,7 +28,7 @@ function loadTsConfig(dirPath: string) {
   const compilerOptions = ts.parseJsonConfigFileContent(
     configFile.config,
     parseConfigHost,
-    dirname(maybeConfigFile)
+    dirname(maybeConfigFile),
   );
 
   return compilerOptions;
@@ -44,7 +44,7 @@ function writeTempSource(testPath: string, sourceCode: string) {
 
 function generateTypeInfo(
   programPath: string,
-  compilerOptions: ts.CompilerOptions
+  compilerOptions: ts.CompilerOptions,
 ) {
   const program = ts.createProgram([programPath], compilerOptions);
 
@@ -63,7 +63,7 @@ function generateTypeInfo(
     const type = checker.getDeclaredTypeOfSymbol(symbol);
     const typeAsString = checker.typeToString(
       type,
-      sourceFile
+      sourceFile,
       // ts.TypeFormatFlags.InTypeAlias
     );
     return { name: symbol.name, typeDef: typeAsString };
