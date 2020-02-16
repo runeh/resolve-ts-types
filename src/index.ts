@@ -1,6 +1,7 @@
 import ts from 'typescript';
 import { dirname, basename, join } from 'path';
 import { writeFileSync, unlinkSync } from 'fs';
+import { resolveConfig, format } from 'prettier';
 
 const typeNamePrefix = '__rfh_checkit__';
 
@@ -71,6 +72,12 @@ function generateTypeInfo(
   return typeDefs;
 }
 
+function prettifySource(dirPath: string, sourceCode: string) {
+  const config = resolveConfig.sync(dirPath);
+
+  return format(sourceCode, { parser: 'typescript', ...(config || {}) });
+}
+
 function preProcessSourceCode(sourceCode: string) {
   return sourceCode.replace(/type\s+(\S+)\s?=/g, (_a, typeName) => {
     return `type ${typeNamePrefix}${typeName} = `;
@@ -91,5 +98,13 @@ export function getTypeDefs(testPath: string, rawSourceCode: string) {
     })
     .join('\n\n');
 
-  return ret;
+  return prettifySource(
+    dirname(testPath),
+    `
+    ${rawSourceCode}
+    
+    /* Generated types: */
+
+    ${ret}`
+  );
 }
