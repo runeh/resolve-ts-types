@@ -14,8 +14,32 @@ function writeTempSource(testPath: string, sourceCode: string) {
 
 function generateTypeInfo(programPath: string) {
   const program = ts.createProgram([programPath], {
-    target: ts.ScriptTarget.ES5,
+    target: ts.ScriptTarget.ES2018,
     module: ts.ModuleKind.CommonJS,
+    lib: ['es2019'],
+    moduleResolution: ts.ModuleResolutionKind.NodeJs,
+    noUnusedLocals: true,
+    noUnusedParameters: true,
+    sourceMap: true,
+    declaration: true,
+    declarationMap: true,
+    strict: true,
+    noImplicitAny: true,
+    strictNullChecks: true,
+    strictFunctionTypes: true,
+    strictPropertyInitialization: true,
+    noImplicitThis: true,
+    alwaysStrict: true,
+    noImplicitReturns: true,
+    noFallthroughCasesInSwitch: true,
+    allowSyntheticDefaultImports: true,
+    resolveJsonModule: true,
+    esModuleInterop: true,
+    typeRoots: [
+      'node_modules/@types',
+      './packages/folio-build-utils/jest/typings',
+    ],
+    types: ['node', 'jest'],
   });
 
   const checker = program.getTypeChecker();
@@ -34,7 +58,25 @@ function generateTypeInfo(programPath: string) {
     const typeAsString = checker.typeToString(
       type,
       sourceFile,
-      ts.TypeFormatFlags.InTypeAlias
+      ts.TypeFormatFlags.NoTruncation |
+        ts.TypeFormatFlags.WriteArrayAsGenericType |
+        ts.TypeFormatFlags.UseStructuralFallback |
+        ts.TypeFormatFlags.WriteTypeArgumentsOfSignature |
+        ts.TypeFormatFlags.UseFullyQualifiedType |
+        ts.TypeFormatFlags.SuppressAnyReturnType |
+        ts.TypeFormatFlags.MultilineObjectLiterals |
+        ts.TypeFormatFlags.WriteClassExpressionAsTypeLiteral |
+        ts.TypeFormatFlags.UseTypeOfFunction |
+        ts.TypeFormatFlags.OmitParameterModifiers |
+        ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope |
+        ts.TypeFormatFlags.AllowUniqueESSymbolType |
+        ts.TypeFormatFlags.InTypeAlias
+
+      // ts.TypeFormatFlags.InTypeAlias |
+      //   ts.TypeFormatFlags.InFirstTypeArgument |
+      //   ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope |
+      //   ts.TypeFormatFlags.InFirstTypeArgument |
+      //   ts.TypeFormatFlags.MultilineObjectLiterals
     );
     return { name: symbol.name, typeDef: typeAsString };
   });
@@ -48,22 +90,17 @@ function preProcessSourceCode(sourceCode: string) {
   });
 }
 
-function main(testPath: string, rawSourceCode: string) {
+export function getTypeDefs(testPath: string, rawSourceCode: string) {
   const sourceCode = preProcessSourceCode(rawSourceCode);
   const tempPath = writeTempSource(testPath, sourceCode);
   const typeInfo = generateTypeInfo(tempPath);
   unlinkSync(tempPath);
 
-  for (const t of typeInfo) {
-    console.log(`type ${t.name.replace(typeNamePrefix, '')} = ${t.typeDef}`);
-  }
+  const ret = typeInfo
+    .map(t => {
+      return `type ${t.name.replace(typeNamePrefix, '')} = ${t.typeDef}`;
+    })
+    .join('\n\n');
+
+  return ret;
 }
-
-main(
-  '/Users/runeh/Documents/prosjekter/jest-ts-type-snapshot/boop.ts',
-  `
-type x = {name: string};
-type y = () => Promise<string>;
-
-`
-);
