@@ -5078,9 +5078,9 @@ rxjs@^6.5.3:
     tslib "^1.9.0"
 
 sade@^1.4.2:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/sade/-/sade-1.7.2.tgz#c70c72dc636c0cadd45db7855175fb1a7161270f"
-  integrity sha512-d/1b9Wg8tuLDQzP2wNmU2gXxkr6Vwip6jdOJ5DLzbJ41AHHtMYtiZ8kEhDCNrxm4Faq0DVLTSescqp0yPr8Cpg==
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/sade/-/sade-1.7.3.tgz#a217ccc4fb4abb2d271648bf48f6628b2636fa1b"
+  integrity sha512-m4BctppMvJ60W1dXnHq7jMmFe3hPJZDAH85kQ3ACTo7XZNVUuTItCQ+2HfyaMeV5cKrbw7l4vD/6We3GBxvdJw==
   dependencies:
     mri "^1.1.0"
 
