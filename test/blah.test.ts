@@ -1,5 +1,4 @@
 import { typeGetter } from '../src/index';
-import dedent from 'dedent';
 
 describe('type getter', () => {
   const resolveTypes = typeGetter(__filename);

@@ -19,7 +19,7 @@ function loadTsConfig(dirPath: string) {
     'tsconfig.json',
   );
 
-  if (maybeConfigFile == undefined) {
+  if (maybeConfigFile === undefined) {
     throw new Error('setOptions: Cannot find tsconfig.json');
   }
 
