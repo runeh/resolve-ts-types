@@ -3,8 +3,6 @@ import { dirname, basename, join } from 'path';
 import { writeFileSync, unlinkSync } from 'fs';
 import { resolveConfig, format } from 'prettier';
 
-const typeNamePrefix = '__rfh_checkit__';
-
 function loadTsConfig(dirPath: string) {
   const parseConfigHost: ts.ParseConfigHost = {
     fileExists: ts.sys.fileExists,
@@ -55,16 +53,24 @@ function generateTypeInfo(
     throw new Error(`Source file not found for path "${programPath}"`);
   }
 
+  const symbolsToPrint = new Set<string>();
+
+  ts.forEachChild(sourceFile, (node: ts.Node) => {
+    if (ts.isTypeAliasDeclaration(node)) {
+      symbolsToPrint.add(String(node.name.escapedText));
+    }
+  });
+
   const symbols = checker
     .getSymbolsInScope(sourceFile, ts.SymbolFlags.TypeAlias)
-    .filter(symbol => symbol.name.startsWith(typeNamePrefix));
+    .filter(e => symbolsToPrint.has(e.name));
 
   const typeDefs = symbols.map(symbol => {
     const type = checker.getDeclaredTypeOfSymbol(symbol);
     const typeAsString = checker.typeToString(
       type,
       sourceFile,
-      ts.TypeFormatFlags.InTypeAlias,
+      ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation,
     );
     return { name: symbol.name, typeDef: typeAsString };
   });
@@ -80,7 +86,7 @@ function prettifySource(dirPath: string, sourceCode: string) {
 
 function preProcessSourceCode(sourceCode: string) {
   return sourceCode.replace(/type\s+(\S+)\s?=/g, (_a, typeName) => {
-    return `type ${typeNamePrefix}${typeName} = `;
+    return `type ${typeName} = `;
   });
 }
 
@@ -92,9 +98,7 @@ export function getTypeDefs(testPath: string, rawSourceCode: string) {
   const typeInfo = generateTypeInfo(tempPath, config.options);
   unlinkSync(tempPath);
 
-  const ret = typeInfo
-    .map(t => `type ${t.name.replace(typeNamePrefix, '')} = ${t.typeDef}`)
-    .join('\n');
+  const ret = typeInfo.map(t => `type ${t.name} = ${t.typeDef}`).join('\n');
 
   return prettifySource(dirname(testPath), ret);
 }

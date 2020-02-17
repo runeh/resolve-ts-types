@@ -50,17 +50,42 @@ describe('type getter', () => {
   it('can resolve record types', () => {
     const resolved = resolveTypes`
       type T1 = 'foo' | 'bar' | 'baz';
-      type T2 = Record<string, { name: string; age: number }>;
-      type T3 = keyof T1;
-      type T4 = {[K in T1]: string };
-      type T4 = Record<T1, string>;
+      type T2 = Record<T1, string>;
     `;
 
     expect(resolved).toMatchInlineSnapshot(`
       "type T1 = 'foo' | 'bar' | 'baz';
-      type T2 = { [x: string]: { name: string; age: number } };
-      type T3 = string | number | symbol;
-      type T4 = { [x: string]: string };
+      type T2 = { foo: string; bar: string; baz: string };
+      "
+    `);
+  });
+
+  it('can resolve some functions', () => {
+    const resolved = resolveTypes`
+      type T1 = typeof global.setTimeout;
+      type T2 = typeof global.escape;
+      type T3 = typeof global.Promise;
+    `;
+
+    expect(resolved).toMatchInlineSnapshot(`
+      "type T1 = (
+        callback: (...args: any[]) => void,
+        ms: number,
+        ...args: any[]
+      ) => NodeJS.Timeout;
+      type T2 = (str: string) => string;
+      type T3 = PromiseConstructor;
+      "
+    `);
+  });
+
+  it('can resolve functions', () => {
+    const resolved = resolveTypes`
+      type T1 = typeof global.escape;
+    `;
+
+    expect(resolved).toMatchInlineSnapshot(`
+      "type T1 = (str: string) => string;
       "
     `);
   });
