@@ -64,7 +64,7 @@ function generateTypeInfo(
     const typeAsString = checker.typeToString(
       type,
       sourceFile,
-      // ts.TypeFormatFlags.InTypeAlias
+      ts.TypeFormatFlags.InTypeAlias,
     );
     return { name: symbol.name, typeDef: typeAsString };
   });
@@ -93,10 +93,8 @@ export function getTypeDefs(testPath: string, rawSourceCode: string) {
   unlinkSync(tempPath);
 
   const ret = typeInfo
-    .map(t => {
-      return `type ${t.name.replace(typeNamePrefix, '')} = ${t.typeDef}`;
-    })
-    .join('\n\n');
+    .map(t => `type ${t.name.replace(typeNamePrefix, '')} = ${t.typeDef}`)
+    .join('\n');
 
   return prettifySource(dirname(testPath), ret);
 }

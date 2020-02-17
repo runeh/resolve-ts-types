@@ -1,5 +1,11 @@
 # resolve-ts-types
 
+## todo
+
+- find the symbols to print properly. Or do better string replace
+
+## intro
+
 Take some typescript code that contains `type x = <something>` amd resolve what
 `<something>` is. For example, given this:
 

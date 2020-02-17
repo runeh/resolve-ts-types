@@ -30,9 +30,11 @@
   "author": "Rune Finstad Halvorsen",
   "module": "dist/resolve-ts-types.esm.js",
   "devDependencies": {
+    "@types/dedent": "^0.7.0",
     "@types/jest": "^25.1.2",
     "@types/node": "^13.7.1",
     "@types/prettier": "^1.19.0",
+    "dedent": "^0.7.0",
     "husky": "^4.2.3",
     "tsdx": "^0.12.3",
     "tslib": "^1.10.0"
