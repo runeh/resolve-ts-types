@@ -1,6 +1,5 @@
 import ts, { CompilerOptions, CompilerHost } from 'typescript';
-import { dirname, basename, join } from 'path';
-import { writeFileSync, unlinkSync } from 'fs';
+import { dirname, join } from 'path';
 import { resolveConfig, format } from 'prettier';
 
 function loadTsConfig(dirPath: string) {
