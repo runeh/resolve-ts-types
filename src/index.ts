@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts, { CompilerOptions, CompilerHost } from 'typescript';
 import { dirname, basename, join } from 'path';
 import { writeFileSync, unlinkSync } from 'fs';
 import { resolveConfig, format } from 'prettier';
@@ -32,20 +32,59 @@ function loadTsConfig(dirPath: string) {
   return compilerOptions;
 }
 
-function writeTempSource(testPath: string, sourceCode: string) {
-  const testDir = dirname(testPath);
-  const testFile = basename(testPath);
-  const tempPath = join(testDir, `_test.${testFile}`);
-  writeFileSync(tempPath, sourceCode, 'utf-8');
-  return tempPath;
+function createHost(
+  options: CompilerOptions,
+  inMemoryFiles: Record<string, ts.SourceFile> = {},
+) {
+  const realHost = ts.createCompilerHost(options, true);
+  const host: CompilerHost = {
+    ...realHost,
+    getSourceFile: (
+      fileName,
+      languageVersion,
+      onError,
+      shouldCreateNewSourceFile,
+    ) => {
+      if (inMemoryFiles[fileName] !== undefined) {
+        return inMemoryFiles[fileName];
+      } else {
+        return realHost.getSourceFile(
+          fileName,
+          languageVersion,
+          onError,
+          shouldCreateNewSourceFile,
+        );
+      }
+    },
+  };
+
+  return host;
+}
+
+function getTempSourcePath(testPath: string) {
+  return join(
+    dirname(testPath),
+    `test-${Math.random()
+      .toString()
+      .replace('.', '')}.ts`,
+  );
 }
 
 function generateTypeInfo(
   programPath: string,
+  sourceCode: string,
   compilerOptions: ts.CompilerOptions,
 ) {
-  const program = ts.createProgram([programPath], compilerOptions);
+  const sourceFiles: Record<string, ts.SourceFile> = {
+    [programPath]: ts.createSourceFile(
+      programPath,
+      sourceCode,
+      ts.ScriptTarget.ES2015,
+    ),
+  };
 
+  const host = createHost(compilerOptions, sourceFiles);
+  const program = ts.createProgram([programPath], compilerOptions, host);
   const checker = program.getTypeChecker();
   const sourceFile = program.getSourceFile(programPath);
 
@@ -80,7 +119,6 @@ function generateTypeInfo(
 
 function prettifySource(dirPath: string, sourceCode: string) {
   const config = resolveConfig.sync(dirPath);
-
   return format(sourceCode, { parser: 'typescript', ...(config || {}) });
 }
 
@@ -92,14 +130,10 @@ function preProcessSourceCode(sourceCode: string) {
 
 export function getTypeDefs(testPath: string, rawSourceCode: string) {
   const config = loadTsConfig(testPath);
-
   const sourceCode = preProcessSourceCode(rawSourceCode);
-  const tempPath = writeTempSource(testPath, sourceCode);
-  const typeInfo = generateTypeInfo(tempPath, config.options);
-  unlinkSync(tempPath);
-
+  const tempPath = getTempSourcePath(testPath);
+  const typeInfo = generateTypeInfo(tempPath, sourceCode, config.options);
   const ret = typeInfo.map(t => `type ${t.name} = ${t.typeDef}`).join('\n');
-
   return prettifySource(dirname(testPath), ret);
 }
 

@@ -65,6 +65,7 @@ describe('type getter', () => {
       type T1 = typeof global.setTimeout;
       type T2 = typeof global.escape;
       type T3 = typeof global.Promise;
+      type T4 = typeof Array.prototype.filter;
     `;
 
     expect(resolved).toMatchInlineSnapshot(`
@@ -75,17 +76,16 @@ describe('type getter', () => {
       ) => NodeJS.Timeout;
       type T2 = (str: string) => string;
       type T3 = PromiseConstructor;
-      "
-    `);
-  });
-
-  it('can resolve functions', () => {
-    const resolved = resolveTypes`
-      type T1 = typeof global.escape;
-    `;
-
-    expect(resolved).toMatchInlineSnapshot(`
-      "type T1 = (str: string) => string;
+      type T4 = {
+        <S extends any>(
+          callbackfn: (value: any, index: number, array: any[]) => value is S,
+          thisArg?: any,
+        ): S[];
+        (
+          callbackfn: (value: any, index: number, array: any[]) => unknown,
+          thisArg?: any,
+        ): any[];
+      };
       "
     `);
   });
