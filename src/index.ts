@@ -38,23 +38,10 @@ function createHost(
   const realHost = ts.createCompilerHost(options, true);
   const host: CompilerHost = {
     ...realHost,
-    getSourceFile: (
-      fileName,
-      languageVersion,
-      onError,
-      shouldCreateNewSourceFile,
-    ) => {
-      if (inMemoryFiles[fileName] !== undefined) {
-        return inMemoryFiles[fileName];
-      } else {
-        return realHost.getSourceFile(
-          fileName,
-          languageVersion,
-          onError,
-          shouldCreateNewSourceFile,
-        );
-      }
-    },
+    getSourceFile: (fileName, ...rest) =>
+      inMemoryFiles[fileName] !== undefined
+        ? inMemoryFiles[fileName]
+        : realHost.getSourceFile(fileName, ...rest),
   };
 
   return host;
