@@ -1,7 +1,7 @@
 import { typeGetter } from '../src/index';
 
 describe('type getter', () => {
-  const resolveTypes = typeGetter(__filename);
+  const resolveTypes = typeGetter(__dirname);
 
   it('can resolve primitives', () => {
     const resolved = resolveTypes`

@@ -2,7 +2,7 @@ import ts, { CompilerOptions, CompilerHost } from 'typescript';
 import { dirname, join } from 'path';
 import { resolveConfig, format } from 'prettier';
 
-function loadTsConfig(dirPath: string) {
+function loadTsConfig(sourceDir: string) {
   const parseConfigHost: ts.ParseConfigHost = {
     fileExists: ts.sys.fileExists,
     readFile: ts.sys.readFile,
@@ -11,7 +11,7 @@ function loadTsConfig(dirPath: string) {
   };
 
   const maybeConfigFile = ts.findConfigFile(
-    dirPath,
+    sourceDir,
     ts.sys.fileExists,
     'tsconfig.json',
   );
@@ -47,13 +47,12 @@ function createHost(
   return host;
 }
 
-function getTempSourcePath(testPath: string) {
-  return join(
-    dirname(testPath),
-    `test-${Math.random()
-      .toString()
-      .replace('.', '')}.ts`,
-  );
+function getTempSourcePath(sourceDir: string) {
+  const randomPart = Math.random()
+    .toString()
+    .replace('.', '');
+
+  return join(sourceDir, `test-${randomPart}.ts`);
 }
 
 function generateTypeInfo(
@@ -114,13 +113,13 @@ function preProcessSourceCode(sourceCode: string) {
   });
 }
 
-export function getTypeDefs(testPath: string, rawSourceCode: string) {
-  const config = loadTsConfig(testPath);
+export function getTypeDefs(sourceDir: string, rawSourceCode: string) {
+  const config = loadTsConfig(sourceDir);
   const sourceCode = preProcessSourceCode(rawSourceCode);
-  const tempPath = getTempSourcePath(testPath);
+  const tempPath = getTempSourcePath(sourceDir);
   const typeInfo = generateTypeInfo(tempPath, sourceCode, config.options);
   const ret = typeInfo.map(t => `type ${t.name} = ${t.typeDef}`).join('\n');
-  return prettifySource(dirname(testPath), ret);
+  return prettifySource(sourceDir, ret);
 }
 
 function sourceTemplate(
@@ -132,11 +131,11 @@ function sourceTemplate(
     : strOrTpl.map((str, i) => str + (args[i] || '')).join('');
 }
 
-export function typeGetter(testPath: string, preamble?: string) {
+export function typeGetter(sourceDir: string, preamble?: string) {
   return (strOrTpl: string | TemplateStringsArray, ...args: any[]) => {
     const source = sourceTemplate(strOrTpl, args);
     const fullSource =
       preamble !== undefined ? `${preamble}\n\n${source}` : source;
-    return getTypeDefs(testPath, fullSource);
+    return getTypeDefs(sourceDir, fullSource);
   };
 }
