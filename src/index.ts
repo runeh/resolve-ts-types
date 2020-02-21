@@ -94,7 +94,14 @@ function generateTypeInfo(
     const typeAsString = checker.typeToString(
       type,
       sourceFile,
-      ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.NoTruncation,
+      ts.TypeFormatFlags.AllowUniqueESSymbolType |
+        ts.TypeFormatFlags.InTypeAlias |
+        ts.TypeFormatFlags.NoTruncation |
+        ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope |
+        ts.TypeFormatFlags.UseFullyQualifiedType |
+        ts.TypeFormatFlags.UseTypeOfFunction |
+        ts.TypeFormatFlags.WriteTypeArgumentsOfSignature |
+        ts.TypeFormatFlags.InTypeAlias,
     );
     return { name: symbol.name, typeDef: typeAsString };
   });

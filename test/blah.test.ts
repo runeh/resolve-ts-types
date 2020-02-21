@@ -77,7 +77,7 @@ describe('type getter', () => {
       type T2 = (str: string) => string;
       type T3 = PromiseConstructor;
       type T4 = {
-        <S extends any>(
+        <S>(
           callbackfn: (value: any, index: number, array: any[]) => value is S,
           thisArg?: any,
         ): S[];
